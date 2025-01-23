@@ -4,6 +4,19 @@ table 52100 "H2O Time Keeping Table"
 
     fields
     {
+        field(1; "Document Type"; Enum "Sales Document Type")
+        {
+            Caption = 'Document Type';
+        }
+        field(3; "Document No."; Code[20])
+        {
+            Caption = 'Document No.';
+            TableRelation = "Sales Header"."No." where("Document Type" = field("Document Type"));
+        }
+        field(4; "Line No."; Integer)
+        {
+            Caption = 'Line No.';
+        }
         field(2; "Sell-to Customer No."; Code[20])
         {
             Caption = 'Sell-to Customer No.';
@@ -126,7 +139,7 @@ table 52100 "H2O Time Keeping Table"
 
     keys
     {
-        key(Key1; Type, "No.")
+        key(Key1; "Document Type", "Document No.", "Line No.")
         {
             Clustered = true;
         }
