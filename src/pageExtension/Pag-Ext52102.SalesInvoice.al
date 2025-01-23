@@ -2,7 +2,7 @@ pageextension 52102 "H2O Sales Invoice" extends "Sales Invoice"
 {
     layout
     {
-        addafter("Bill-to Contact No.")
+        addlast("Shipping and Billing")
         {
             field("H2O Route No."; Rec."H2O Route No.")
             {
