@@ -6,6 +6,7 @@ tableextension 52101 "H2O Sales Line" extends "Sales line"
         {
             DataClassification = ToBeClassified;
             DecimalPlaces = 0 : 5;
+            caption = 'Time Worked';
         }
     }
 
