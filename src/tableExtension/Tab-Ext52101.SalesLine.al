@@ -17,7 +17,7 @@ tableextension 52101 "H2O Sales Line" extends "Sales line"
         field(52203; "H2O Vendor PO"; code[35])
         {
             DataClassification = ToBeClassified;
-            caption = 'Vendor No.';
+            caption = 'Vendor PO';
         }
     }
 
