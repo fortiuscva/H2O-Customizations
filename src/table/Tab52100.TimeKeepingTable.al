@@ -130,10 +130,10 @@ table 52100 "H2O Time Keeping Table"
             //Editable = false;
             TableRelation = "Ship-to Address".Code where("Customer No." = field("Sell-to Customer No."));
         }
-        field(50208; "Time Worked"; Decimal)
+        field(52201; "Time Worked"; Decimal)
         {
             DataClassification = ToBeClassified;
-            DecimalPlaces = 0 : 2;
+            DecimalPlaces = 0 : 5;
         }
     }
 
