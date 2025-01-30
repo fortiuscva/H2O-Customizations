@@ -7,6 +7,17 @@ tableextension 52101 "H2O Sales Line" extends "Sales line"
             DataClassification = ToBeClassified;
             DecimalPlaces = 0 : 5;
         }
+        field(52202; "H2O Vendor No."; code[20])
+        {
+            DataClassification = ToBeClassified;
+            caption = 'Vendor No.';
+            Tablerelation = Vendor;
+        }
+        field(52203; "H2O Vendor PO"; code[35])
+        {
+            DataClassification = ToBeClassified;
+            caption = 'Vendor No.';
+        }
     }
 
     trigger OnAfterModify()
