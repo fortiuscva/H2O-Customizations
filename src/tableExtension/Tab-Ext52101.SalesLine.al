@@ -19,6 +19,12 @@ tableextension 52101 "H2O Sales Line" extends "Sales line"
             DataClassification = ToBeClassified;
             caption = 'Vendor PO';
         }
+        field(52204; "H2O PO Amount"; Decimal)
+        {
+            DataClassification = ToBeClassified;
+            caption = 'PO Amount';
+            DecimalPlaces = 0 : 5;
+        }
     }
 
     trigger OnAfterModify()
