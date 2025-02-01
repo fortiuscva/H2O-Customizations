@@ -18,6 +18,7 @@ pageextension 52103 "H2O Sales Invoice Subform" extends "Sales Invoice Subform"
             {
                 ApplicationArea = all;
                 ToolTip = 'PO Amount';
+                BlankZero = true;
             }
             field("H2O Time Worked"; Rec."H2O Time Worked")
             {
