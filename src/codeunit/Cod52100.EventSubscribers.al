@@ -5,6 +5,8 @@ codeunit 52100 "H2O Event Subscribers"
     var
         TimeKeepingRec: Record "H2O Time Keeping Table";
     begin
+        if (Rec.Type <> Rec.Type::Resource) or (Rec."Resource Type" <> Rec."Resource Type"::Person) then
+            exit;
         TimeKeepingRec.Init();
         TimeKeepingRec."Document Type" := Rec."Document Type";
         TimeKeepingRec."Document No." := Rec."Document No.";
