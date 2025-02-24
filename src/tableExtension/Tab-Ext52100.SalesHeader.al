@@ -2,22 +2,27 @@ tableextension 52100 "H2O Sales Header" extends "sales header"
 {
     fields
     {
+        modify("Sell-to Customer No.")
+        {
+            trigger OnAfterValidate()
+            begin
+                Rec.Validate("Work Order Type Code", Rec."Shortcut Dimension 2 Code");
+            end;
+        }
         modify("Shortcut Dimension 2 Code")
         {
             trigger OnAfterValidate()
             begin
-                if Rec."Work Order Type Code" = Rec."Shortcut Dimension 2 Code" then
-                    exit;
-                Rec.Validate("Work Order Type Code", Rec."Shortcut Dimension 2 Code");
+                if Rec."Work Order Type Code" <> Rec."Shortcut Dimension 2 Code" then
+                    Rec.Validate("Work Order Type Code", Rec."Shortcut Dimension 2 Code");
             end;
         }
         modify("Work Order Type Code")
         {
             trigger OnAfterValidate()
             begin
-                if Rec."Shortcut Dimension 2 Code" = Rec."Work Order Type Code" then
-                    exit;
-                Rec.Validate("Shortcut Dimension 2 Code", Rec."Work Order Type Code");
+                if Rec."Shortcut Dimension 2 Code" <> Rec."Work Order Type Code" then
+                    Rec.Validate("Shortcut Dimension 2 Code", Rec."Work Order Type Code");
             end;
 
         }
