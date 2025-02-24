@@ -7,19 +7,26 @@ tableextension 52102 "H2O Ship to Address" extends "Ship-to Address"
             Caption = 'Pending Property';
             DataClassification = ToBeClassified;
             trigger OnValidate()
+            var
+                SalesandRecieveSetup: Record "Sales & Receivables Setup";
+                NoSeries: Codeunit "No. Series";
             begin
-                Rec.TestField(Code, '');
-                Rec.Validate(Code, '');
+                if (Rec."H2O Pending Property" = true) then begin
+                    Rec.TestField("H2O Temporary Property No.", '');
+                    SalesandRecieveSetup.get;
+                    SalesandRecieveSetup.TestField("H2O Temporary Property Nos.");
+                    Rec.Code := NoSeries.GetNextNo(SalesandRecieveSetup."H2O Temporary Property Nos.", WorkDate());
+                    //if not Rec.Insert(true) then
+                    //Rec.Rename(Rec.code)
+                end else
+                    Rec."H2O Temporary Property No." := Rec.Code;
             end;
         }
-        modify(Code)
+        field(52101; "H2O Temporary Property No."; Code[10])
         {
-            trigger OnAfterValidate()
-            begin
-                if Code <> '' then
-                    if "H2O Pending Property" then
-                        Validate("H2O Pending Property", false);
-            end;
+            Caption = 'Temporary Property No.';
+            Editable = false;
+            DataClassification = ToBeClassified;
         }
     }
 }

@@ -1,4 +1,4 @@
-codeunit 52101 "H2O General Procedures"
+codeunit 52101 "H2O General Functions"
 {
     procedure InsertRecordInTimeKeepingTable(var Rec: Record "Sales Line")
     var
@@ -6,6 +6,7 @@ codeunit 52101 "H2O General Procedures"
     begin
         if (Rec.Type <> Rec.Type::Resource) or (Rec."Resource Type" <> Rec."Resource Type"::Person) then
             exit;
+
         TimeKeepingRec.Init();
         TimeKeepingRec."Document Type" := Rec."Document Type";
         TimeKeepingRec."Document No." := Rec."Document No.";

@@ -4,6 +4,11 @@ pageextension 52100 "H2O Ship-to address list" extends "Ship-to address list"
     {
         addlast(Control1)
         {
+            field("H2O Temporary Property No."; Rec."H2O Temporary Property No.")
+            {
+                ApplicationArea = all;
+                ToolTip = 'Temporary Property No.';
+            }
             field("H2O Route No."; Rec."Route No.")
             {
                 ApplicationArea = all;
