@@ -3,33 +3,37 @@ codeunit 52101 "H2O General Functions"
     procedure InsertRecordInTimeKeepingTable(var Rec: Record "Sales Line")
     var
         TimeKeepingRec: Record "H2O Time Keeping Table";
+        InsertTimeKeepingRecord: Boolean;
     begin
-        if (Rec.Type <> Rec.Type::Resource) or (Rec."Resource Type" <> Rec."Resource Type"::Person) then
-            exit;
+        InsertTimeKeepingRecord := false;
+        if (Rec.Type = Rec.Type::Resource) and (Rec."Resource Type" = Rec."Resource Type"::Person) then
+            InsertTimeKeepingRecord := true;
 
-        TimeKeepingRec.Init();
-        TimeKeepingRec."Document Type" := Rec."Document Type";
-        TimeKeepingRec."Document No." := Rec."Document No.";
-        TimeKeepingRec."Line No." := Rec."Line No.";
-        TimeKeepingRec.Insert();
-        TimeKeepingRec."Sell-to Customer No." := Rec."Sell-to Customer No.";
-        TimeKeepingRec.Type := Rec.Type;
-        TimeKeepingRec."No." := Rec."No.";
-        TimeKeepingRec.Description := Rec.Description;
-        TimeKeepingRec.Quantity := Rec.Quantity;
-        TimeKeepingRec."Unit Price" := Rec."Unit Price";
-        TimeKeepingRec."Shortcut Dimension 1 Code" := Rec."Shortcut Dimension 1 Code";
-        TimeKeepingRec."Shortcut Dimension 2 Code" := Rec."Shortcut Dimension 2 Code";
-        TimeKeepingRec."Unit of Measure Code" := Rec."Unit of Measure Code";
-        TimeKeepingRec."Start Date" := Rec."Start Date";
-        TimeKeepingRec."Start Time" := Rec."Start Time";
-        TimeKeepingRec."End Date" := Rec."End Date";
-        TimeKeepingRec."End Time" := Rec."End Time";
-        TimeKeepingRec."Original Document No." := Rec."Document No.";
-        TimeKeepingRec."Original Line No." := Rec."Line No.";
-        TimeKeepingRec."Original Ship-to Code" := Rec."Original Ship-to Code";
-        TimeKeepingRec."Time Worked" := Rec."H2O Time Worked";
-        TimeKeepingRec.Modify();
+        if InsertTimeKeepingRecord then begin
+            TimeKeepingRec.Init();
+            TimeKeepingRec."Document Type" := Rec."Document Type";
+            TimeKeepingRec."Document No." := Rec."Document No.";
+            TimeKeepingRec."Line No." := Rec."Line No.";
+            TimeKeepingRec.Insert();
+            TimeKeepingRec."Sell-to Customer No." := Rec."Sell-to Customer No.";
+            TimeKeepingRec.Type := Rec.Type;
+            TimeKeepingRec."No." := Rec."No.";
+            TimeKeepingRec.Description := Rec.Description;
+            TimeKeepingRec.Quantity := Rec.Quantity;
+            TimeKeepingRec."Unit Price" := Rec."Unit Price";
+            TimeKeepingRec."Shortcut Dimension 1 Code" := Rec."Shortcut Dimension 1 Code";
+            TimeKeepingRec."Shortcut Dimension 2 Code" := Rec."Shortcut Dimension 2 Code";
+            TimeKeepingRec."Unit of Measure Code" := Rec."Unit of Measure Code";
+            TimeKeepingRec."Start Date" := Rec."Start Date";
+            TimeKeepingRec."Start Time" := Rec."Start Time";
+            TimeKeepingRec."End Date" := Rec."End Date";
+            TimeKeepingRec."End Time" := Rec."End Time";
+            TimeKeepingRec."Original Document No." := Rec."Document No.";
+            TimeKeepingRec."Original Line No." := Rec."Line No.";
+            TimeKeepingRec."Original Ship-to Code" := Rec."Original Ship-to Code";
+            TimeKeepingRec."Time Worked" := Rec."H2O Time Worked";
+            TimeKeepingRec.Modify();
+        end;
     end;
 
     procedure ModifyRecordInTimeKeepingTable(var Rec: Record "Sales Line")
