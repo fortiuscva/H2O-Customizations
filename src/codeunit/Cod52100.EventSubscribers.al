@@ -23,7 +23,13 @@ codeunit 52100 "H2O Event Subscribers"
     var
         GeneralFunctions: Codeunit "H2O General Functions";
     begin
-        GeneralFunctions.InsertRecordInTimeKeepingTable(Rec);
+        IF Rec.Type = Rec.Type::Resource then
+            If Res.get(Rec."No.") then begin
+                Rec.validate("Work Type Code", Res."Work Type Code");
+                Rec.validate("WO Supervisor", Res.Supervisor);
+                Rec.validate("Resource Type", Res.Type);
+                GeneralFunctions.InsertRecordInTimeKeepingTable(Rec);
+            end;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterModifyEvent', '', false, false)]
@@ -33,4 +39,7 @@ codeunit 52100 "H2O Event Subscribers"
     begin
         GeneralFunctions.ModifyRecordInTimeKeepingTable(Rec);
     end;
+
+    var
+        Res: Record Resource;
 }
