@@ -1,5 +1,6 @@
 pageextension 52102 "H2O Sales Invoice" extends "Sales Invoice"
 {
+    Caption = 'Work Order';
     layout
     {
         addlast("Shipping and Billing")
