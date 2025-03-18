@@ -17,4 +17,8 @@ pageextension 52102 "H2O Sales Invoice" extends "Sales Invoice"
             }
         }
     }
+    trigger OnOpenPage()
+    begin
+        CurrPage.Caption('Work Order');
+    end;
 }
