@@ -26,6 +26,41 @@ pageextension 52103 "H2O Sales Invoice Subform" extends "Sales Invoice Subform"
                 ToolTip = 'Time worked';
                 BlankZero = true;
             }
+            field("H2O Meter No."; Rec."H2O Meter No.")
+            {
+                ApplicationArea = all;
+                ToolTip = 'Meter No.';
+            }
+            field("H2O Meter Read"; Rec."H2O Meter Read")
+            {
+                ApplicationArea = all;
+                ToolTip = 'Meter Reading';
+            }
+            field("H2O EID"; Rec."H2O EID")
+            {
+                ApplicationArea = all;
+                ToolTip = 'EID';
+            }
+            field("H2O Endpoint type"; Rec."H2O Endpoint type")
+            {
+                ApplicationArea = all;
+                ToolTip = 'Endpoint type';
+            }
+            field("H2O Register Res"; Rec."H2O Register Res")
+            {
+                ApplicationArea = all;
+                ToolTip = 'Register Res';
+            }
+            field("H2O Meter Model"; Rec."H2O Meter Model")
+            {
+                ApplicationArea = all;
+                ToolTip = 'Meter Model';
+            }
+            field("H2O Meter Size"; Rec."H2O Meter Size")
+            {
+                ApplicationArea = all;
+                ToolTip = 'Meter Size';
+            }
         }
     }
 }

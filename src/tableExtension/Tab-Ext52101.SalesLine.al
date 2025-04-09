@@ -25,6 +25,44 @@ tableextension 52101 "H2O Sales Line" extends "Sales line"
             caption = 'PO Amount';
             DecimalPlaces = 0 : 5;
         }
+        field(52205; "H2O Meter No."; Code[20])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Meter #';
+        }
+        field(52206; "H2O Meter Read"; Decimal)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Meter Read';
+            DecimalPlaces = 0 : 2;
+        }
+        field(52207; "H2O EID"; Integer)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'EID';
+        }
+        field(52208; "H2O Endpoint type"; Text[3])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Endpoint type';
+        }
+        field(52209; "H2O Register Res"; Decimal)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Register Res';
+            DecimalPlaces = 0 : 3;
+        }
+        field(52210; "H2O Meter Model"; Code[15])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Meter Model';
+        }
+        field(52211; "H2O Meter Size"; Decimal)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Meter Size';
+            DecimalPlaces = 0 : 3;
+        }
     }
 
     /* trigger OnAfterModify()
