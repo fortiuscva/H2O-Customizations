@@ -26,12 +26,12 @@ pageextension 52103 "H2O Sales Invoice Subform" extends "Sales Invoice Subform"
                 ToolTip = 'Time worked';
                 BlankZero = true;
             }
-            field("H2O Meter #"; Rec."H2O Meter #")
+            field("H2O Meter No."; Rec."H2O Meter No.")
             {
                 ApplicationArea = all;
-                ToolTip = 'Meter #';
+                ToolTip = 'Meter No.';
             }
-            field("H2O Meter Read"; Rec."H2O Meter Reading")
+            field("H2O Meter Read"; Rec."H2O Meter Read")
             {
                 ApplicationArea = all;
                 ToolTip = 'Meter Reading';

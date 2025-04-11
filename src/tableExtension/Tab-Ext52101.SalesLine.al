@@ -25,15 +25,15 @@ tableextension 52101 "H2O Sales Line" extends "Sales line"
             caption = 'PO Amount';
             DecimalPlaces = 0 : 5;
         }
-        field(52205; "H2O Meter #"; Code[20])
+        field(52205; "H2O Meter No."; Code[20])
         {
             DataClassification = CustomerContent;
             Caption = 'Meter #';
         }
-        field(52206; "H2O Meter Reading"; Decimal)
+        field(52206; "H2O Meter Read"; Decimal)
         {
             DataClassification = CustomerContent;
-            Caption = 'Meter Reading';
+            Caption = 'Meter Read';
             DecimalPlaces = 0 : 2;
         }
         field(52207; "H2O EID"; Integer)
