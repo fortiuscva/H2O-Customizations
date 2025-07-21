@@ -4,6 +4,7 @@ codeunit 52101 "H2O General Functions"
     var
         TimeKeepingRec: Record "H2O Time Keeping Table";
         InsertTimeKeepingRecord: Boolean;
+        LastEntryNo: Integer;
     begin
         InsertTimeKeepingRecord := false;
         if (Rec.Type = Rec.Type::Resource) and (Rec."Resource Type" = Rec."Resource Type"::Person) then
@@ -11,6 +12,14 @@ codeunit 52101 "H2O General Functions"
 
         if InsertTimeKeepingRecord then begin
             TimeKeepingRec.Init();
+            TimeKeepingRec.SetCurrentKey("Entry No.");
+            if TimeKeepingRec.FindLast() then
+                LastEntryNo := TimeKeepingRec."Entry No."
+            else
+                LastEntryNo := 0;
+
+            TimeKeepingRec."Entry No." := LastEntryNo + 1;
+
             TimeKeepingRec."Document Type" := Rec."Document Type";
             TimeKeepingRec."Document No." := Rec."Document No.";
             TimeKeepingRec."Line No." := Rec."Line No.";
