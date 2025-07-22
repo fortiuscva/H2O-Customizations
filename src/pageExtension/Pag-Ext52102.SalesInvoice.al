@@ -48,6 +48,7 @@ pageextension 52102 "H2O Sales Invoice" extends "Sales Invoice"
                 OutStreamLcl.WriteText(WOComments);
                 RecLink.Modify();
             end else begin
+                RecLink.Reset();
                 if RecLink.FindLast() then
                     EntryNo := RecLink."Link ID" + 1
                 else
