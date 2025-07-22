@@ -2,7 +2,7 @@
   "id": "647fa53d-f6d7-4d01-bce6-b9330d9c9e14",
   "name": "H2O Customizations",
   "publisher": "Adcirrus ERP",
-  "version": "1.0.0.13",
+  "version": "1.0.0.14",
   "brief": "",
   "description": "",
   "privacyStatement": "",
@@ -16,6 +16,12 @@
       "name": "H2O-01",
       "version": "1.0.0.8",
       "publisher": "Impact Networking"
+    },
+    {
+      "id": "a8ec3a17-0410-4858-be04-dea9241f531c",
+      "name": "Primo Payday",
+      "version": "25.42.1.0",
+      "publisher": "Primo Payday"
     }
   ],
   "screenshots": [],

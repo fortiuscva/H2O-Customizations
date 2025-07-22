@@ -135,6 +135,25 @@ table 52100 "H2O Time Keeping Table"
             DataClassification = ToBeClassified;
             DecimalPlaces = 0 : 5;
         }
+        field(52202; "Entry No."; Integer)
+        {
+            Caption = 'Entry No.';
+            DataClassification = ToBeClassified;
+        }
+
+        field(52203; "Payroll Code"; Code[20])
+        {
+            Caption = 'Payroll Code';
+            DataClassification = ToBeClassified;
+            TableRelation = "USPY Payroll Code".Code;
+        }
+
+        field(52204; "Payroll Description"; Text[100])
+        {
+            Caption = 'Payroll Description';
+            FieldClass = FlowField;
+            CalcFormula = lookup("USPY Payroll Code".Description where(Code = field("Payroll Code")));
+        }
     }
 
     keys

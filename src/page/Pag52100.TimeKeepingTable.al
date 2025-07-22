@@ -76,6 +76,24 @@ page 52100 "H2O Time Keeping Table"
                 {
                     ToolTip = 'Specifies the value of the Time Worked field.', Comment = '%';
                 }
+
+                field("Entry No."; Rec."Entry No.")
+                {
+                    ApplicationArea = All;
+                    Editable = false;
+                }
+
+                field("Payroll Code"; Rec."Payroll Code")
+                {
+                    ApplicationArea = All;
+                }
+
+                field("Payroll Description"; Rec."Payroll Description")
+                {
+                    ApplicationArea = All;
+                    Editable = false;
+                }
+
             }
         }
     }
