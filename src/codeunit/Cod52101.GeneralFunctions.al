@@ -34,7 +34,7 @@ codeunit 52101 "H2O General Functions"
             TimeKeepingRec.Validate("Document Type", Rec."Document Type");
             TimeKeepingRec.Validate("Document No.", Rec."Document No.");
             TimeKeepingRec.Validate("Line No.", Rec."Line No.");
-            TimeKeepingRec.Validate("Sell-to Customer No.", Rec."Sell-to Customer No.");
+            TimeKeepingRec.Validate("Sell-to Customer No.", Rec."Bill-to Customer No.");
             TimeKeepingRec.Validate(Type, Rec.Type);
             TimeKeepingRec.Validate("No.", Rec."No.");
             TimeKeepingRec.Validate(Description, Rec.Description);
@@ -66,7 +66,7 @@ codeunit 52101 "H2O General Functions"
 
         if TimeKeepingRec.FindFirst() then begin
             if TimeKeepingRec."Sell-to Customer No." = '' then
-                TimeKeepingRec.Validate("Sell-to Customer No.", Rec."Sell-to Customer No.");
+                TimeKeepingRec.Validate("Sell-to Customer No.", Rec."Bill-to Customer No.");
             if TimeKeepingRec.Type = TimeKeepingRec.Type::" " then
                 TimeKeepingRec.Validate(Type, Rec.Type);
             if TimeKeepingRec."No." = '' then

@@ -80,7 +80,7 @@ page 52100 "H2O Time Keeping Table"
                 field("Entry No."; Rec."Entry No.")
                 {
                     ApplicationArea = All;
-                    Editable = false;
+                    Visible = false;
                 }
 
                 field("Payroll Code"; Rec."Payroll Code")
@@ -96,7 +96,6 @@ page 52100 "H2O Time Keeping Table"
                 field("Entry Number"; Rec."Entry Number")
                 {
                     ApplicationArea = All;
-                    Editable = false;
                 }
                 field("Payroll Code Type"; Rec."Payroll Code Type")
                 {
