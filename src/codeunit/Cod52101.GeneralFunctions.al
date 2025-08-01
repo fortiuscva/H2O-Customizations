@@ -17,6 +17,7 @@ codeunit 52101 "H2O General Functions"
             NextEntryNo := TimeKeepingRec."Entry No." + 1
         else
             NextEntryNo := 1;
+        CurrentYear := Format(Date2DMY(TODAY, 3));
         InsertTimeKeepingRecord := false;
         if (Rec.Type = Rec.Type::Resource) and (Rec."Resource Type" = Rec."Resource Type"::Person) then
             InsertTimeKeepingRecord := true;
