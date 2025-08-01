@@ -12,6 +12,11 @@ page 52100 "H2O Time Keeping Table"
         {
             repeater(General)
             {
+                field("Entry No."; Rec."Entry No.")
+                {
+                    ApplicationArea = All;
+                    Visible = false;
+                }
                 field(Type; Rec."Type")
                 {
                     ToolTip = 'Specifies the value of the Type field.', Comment = '%';
@@ -77,12 +82,11 @@ page 52100 "H2O Time Keeping Table"
                     ToolTip = 'Specifies the value of the Time Worked field.', Comment = '%';
                 }
 
-                field("Entry No."; Rec."Entry No.")
-                {
-                    ApplicationArea = All;
-                    Visible = false;
-                }
 
+                field("Payroll Code Type"; Rec."Payroll Code Type")
+                {
+                    ApplicationArea = all;
+                }
                 field("Payroll Code"; Rec."Payroll Code")
                 {
                     ApplicationArea = All;
@@ -97,10 +101,7 @@ page 52100 "H2O Time Keeping Table"
                 {
                     ApplicationArea = All;
                 }
-                field("Payroll Code Type"; Rec."Payroll Code Type")
-                {
-                    ApplicationArea = all;
-                }
+
 
             }
         }
