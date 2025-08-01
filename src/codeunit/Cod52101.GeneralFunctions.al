@@ -9,7 +9,14 @@ codeunit 52101 "H2O General Functions"
         CurrentYear: Text[4];
         NewNo: Integer;
         NewEntryNumber: Text[20];
+        NextEntryNo: Integer;
     begin
+        TimeKeepingRec.Reset();
+        TimeKeepingRec.SetCurrentKey("Entry No.");
+        if TimeKeepingRec.FindLast() then
+            NextEntryNo := TimeKeepingRec."Entry No." + 1
+        else
+            NextEntryNo := 1;
         InsertTimeKeepingRecord := false;
         if (Rec.Type = Rec.Type::Resource) and (Rec."Resource Type" = Rec."Resource Type"::Person) then
             InsertTimeKeepingRecord := true;
@@ -25,10 +32,10 @@ codeunit 52101 "H2O General Functions"
                 LastNo := 0;
 
             NewNo := LastNo + 1;
-            NewEntryNumber := CurrentYear + Format(NewNo);
+            NewEntryNumber := Format(CurrentYear) + Format(NewNo);
 
             TimeKeepingRec.Init();
-            TimeKeepingRec.Validate("Entry No.", NewNo);
+            TimeKeepingRec.Validate("Entry No.", NextEntryNo);
             TimeKeepingRec.Insert();
 
             TimeKeepingRec.Validate("Document Type", Rec."Document Type");
