@@ -93,6 +93,15 @@ page 52100 "H2O Time Keeping Table"
                     ApplicationArea = All;
                     Editable = false;
                 }
+                field("Entry Number"; Rec."Entry Number")
+                {
+                    ApplicationArea = All;
+                    Editable = false;
+                }
+                field("Payroll Code Type"; Rec."Payroll Code Type")
+                {
+                    ApplicationArea = all;
+                }
 
             }
         }

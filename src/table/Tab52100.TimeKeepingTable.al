@@ -135,9 +135,9 @@ table 52100 "H2O Time Keeping Table"
             DataClassification = ToBeClassified;
             DecimalPlaces = 0 : 5;
         }
-        field(52202; "Entry No."; Integer)
+        field(52202; "Entry Number"; Text[20])
         {
-            Caption = 'Entry No.';
+            Caption = 'Entry Number';
             DataClassification = ToBeClassified;
         }
 
@@ -151,16 +151,31 @@ table 52100 "H2O Time Keeping Table"
         field(52204; "Payroll Description"; Text[100])
         {
             Caption = 'Payroll Description';
+            Editable = false;
             FieldClass = FlowField;
             CalcFormula = lookup("USPY Payroll Code".Description where(Code = field("Payroll Code")));
+        }
+        field(52205; "Entry No."; Integer)
+        {
+            DataClassification = ToBeClassified;
+            Caption = 'Entry No.';
+        }
+        field(52206; "Payroll Code Type"; Text[50])
+        {
+            DataClassification = ToBeClassified;
+            Caption = 'Payroll Code Type';
+            TableRelation = "USPY Payroll Code".Type;
         }
     }
 
     keys
     {
-        key(Key1; "Document Type", "Document No.", "Line No.")
+        key(key1; "Entry No.")
         {
             Clustered = true;
+        }
+        key(Key2; "Document Type", "Document No.", "Line No.")
+        {
         }
     }
 
