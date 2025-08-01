@@ -4,49 +4,54 @@ codeunit 52101 "H2O General Functions"
     var
         TimeKeepingRec: Record "H2O Time Keeping Table";
         InsertTimeKeepingRecord: Boolean;
-        LastEntryNo: Integer;
+        LastEntryNumber: Text[20];
         LastNo: Integer;
-        CurrentYear: Integer;
+        CurrentYear: Text[4];
+        NewNo: Integer;
+        NewEntryNumber: Text[20];
     begin
         InsertTimeKeepingRecord := false;
         if (Rec.Type = Rec.Type::Resource) and (Rec."Resource Type" = Rec."Resource Type"::Person) then
             InsertTimeKeepingRecord := true;
 
         if InsertTimeKeepingRecord then begin
+
+            TimeKeepingRec.SetFilter("Entry Number", Format(CurrentYear) + '*');
+            if TimeKeepingRec.FindLast() then begin
+                LastEntryNumber := TimeKeepingRec."Entry Number";
+                if not EVALUATE(LastNo, CopyStr(LastEntryNumber, 5)) then
+                    LastNo := 0;
+            end else
+                LastNo := 0;
+
+            NewNo := LastNo + 1;
+            NewEntryNumber := CurrentYear + Format(NewNo);
+
             TimeKeepingRec.Init();
-            TimeKeepingRec.SetCurrentKey("Entry No.");
-            if TimeKeepingRec.FindLast() then
-                LastEntryNo := TimeKeepingRec."Entry No."
-            else
-                LastEntryNo := 0;
-            CurrentYear := Date2DMY(TODAY, 3);
-            LastNo := 0;
-            if LastEntryNo DIV 10 = CurrentYear then
-                LastNo := LastEntryNo MOD 10;
-
-            TimeKeepingRec."Entry No." := (CurrentYear * 10) + (LastNo + 1);
-
-            TimeKeepingRec."Document Type" := Rec."Document Type";
-            TimeKeepingRec."Document No." := Rec."Document No.";
-            TimeKeepingRec."Line No." := Rec."Line No.";
+            TimeKeepingRec.Validate("Entry No.", NewNo);
             TimeKeepingRec.Insert();
-            TimeKeepingRec."Sell-to Customer No." := Rec."Sell-to Customer No.";
-            TimeKeepingRec.Type := Rec.Type;
-            TimeKeepingRec."No." := Rec."No.";
-            TimeKeepingRec.Description := Rec.Description;
-            TimeKeepingRec.Quantity := Rec.Quantity;
-            TimeKeepingRec."Unit Price" := Rec."Unit Price";
-            TimeKeepingRec."Shortcut Dimension 1 Code" := Rec."Shortcut Dimension 1 Code";
-            TimeKeepingRec."Shortcut Dimension 2 Code" := Rec."Shortcut Dimension 2 Code";
-            TimeKeepingRec."Unit of Measure Code" := Rec."Unit of Measure Code";
-            TimeKeepingRec."Start Date" := Rec."Start Date";
-            TimeKeepingRec."Start Time" := Rec."Start Time";
-            TimeKeepingRec."End Date" := Rec."End Date";
-            TimeKeepingRec."End Time" := Rec."End Time";
-            TimeKeepingRec."Original Document No." := Rec."Document No.";
-            TimeKeepingRec."Original Line No." := Rec."Line No.";
-            TimeKeepingRec."Original Ship-to Code" := Rec."Original Ship-to Code";
-            TimeKeepingRec."Time Worked" := Rec."H2O Time Worked";
+
+            TimeKeepingRec.Validate("Document Type", Rec."Document Type");
+            TimeKeepingRec.Validate("Document No.", Rec."Document No.");
+            TimeKeepingRec.Validate("Line No.", Rec."Line No.");
+            TimeKeepingRec.Validate("Sell-to Customer No.", Rec."Sell-to Customer No.");
+            TimeKeepingRec.Validate(Type, Rec.Type);
+            TimeKeepingRec.Validate("No.", Rec."No.");
+            TimeKeepingRec.Validate(Description, Rec.Description);
+            TimeKeepingRec.Validate(Quantity, Rec.Quantity);
+            TimeKeepingRec.Validate("Unit Price", Rec."Unit Price");
+            TimeKeepingRec.Validate("Shortcut Dimension 1 Code", Rec."Shortcut Dimension 1 Code");
+            TimeKeepingRec.Validate("Shortcut Dimension 2 Code", Rec."Shortcut Dimension 2 Code");
+            TimeKeepingRec.Validate("Unit of Measure Code", Rec."Unit of Measure Code");
+            TimeKeepingRec.Validate("Start Date", Rec."Start Date");
+            TimeKeepingRec.Validate("Start Time", Rec."Start Time");
+            TimeKeepingRec.Validate("End Date", Rec."End Date");
+            TimeKeepingRec.Validate("End Time", Rec."End Time");
+            TimeKeepingRec.Validate("Original Document No.", Rec."Document No.");
+            TimeKeepingRec.Validate("Original Line No.", Rec."Line No.");
+            TimeKeepingRec.Validate("Original Ship-to Code", Rec."Original Ship-to Code");
+            TimeKeepingRec.Validate("Time Worked", Rec."H2O Time Worked");
+            TimeKeepingRec.Validate("Entry Number", NewEntryNumber);
             TimeKeepingRec.Modify();
         end;
     end;
@@ -55,41 +60,45 @@ codeunit 52101 "H2O General Functions"
     var
         TimeKeepingRec: Record "H2O Time Keeping Table";
     begin
-        if TimeKeepingRec.Get(Rec."Document Type", Rec."Document No.", Rec."Line No.") then begin
+        TimeKeepingRec.SetRange("Document Type", Rec."Document Type");
+        TimeKeepingRec.SetRange("Document No.", Rec."Document No.");
+        TimeKeepingRec.SetRange("Line No.", Rec."Line No.");
+
+        if TimeKeepingRec.FindFirst() then begin
             if TimeKeepingRec."Sell-to Customer No." = '' then
-                TimeKeepingRec."Sell-to Customer No." := Rec."Sell-to Customer No.";
+                TimeKeepingRec.Validate("Sell-to Customer No.", Rec."Sell-to Customer No.");
             if TimeKeepingRec.Type = TimeKeepingRec.Type::" " then
-                TimeKeepingRec.Type := Rec.Type;
+                TimeKeepingRec.Validate(Type, Rec.Type);
             if TimeKeepingRec."No." = '' then
-                TimeKeepingRec."No." := Rec."No.";
+                TimeKeepingRec.Validate("No.", Rec."No.");
             if TimeKeepingRec.Description = '' then
-                TimeKeepingRec.Description := Rec.Description;
+                TimeKeepingRec.Validate(Description, Rec.Description);
             if TimeKeepingRec.Quantity = 0 then
-                TimeKeepingRec.Quantity := Rec.Quantity;
+                TimeKeepingRec.Validate(Quantity, Rec.Quantity);
             if TimeKeepingRec."Unit Price" = 0 then
-                TimeKeepingRec."Unit Price" := Rec."Unit Price";
+                TimeKeepingRec.Validate("Unit Price", Rec."Unit Price");
             if TimeKeepingRec."Shortcut Dimension 1 Code" = '' then
-                TimeKeepingRec."Shortcut Dimension 1 Code" := Rec."Shortcut Dimension 1 Code";
+                TimeKeepingRec.Validate("Shortcut Dimension 1 Code", Rec."Shortcut Dimension 1 Code");
             if TimeKeepingRec."Shortcut Dimension 2 Code" = '' then
-                TimeKeepingRec."Shortcut Dimension 2 Code" := Rec."Shortcut Dimension 2 Code";
+                TimeKeepingRec.Validate("Shortcut Dimension 2 Code", Rec."Shortcut Dimension 2 Code");
             if TimeKeepingRec."Unit of Measure Code" = '' then
-                TimeKeepingRec."Unit of Measure Code" := Rec."Unit of Measure Code";
+                TimeKeepingRec.Validate("Unit of Measure Code", Rec."Unit of Measure Code");
             if TimeKeepingRec."Start Date" = 0D then
-                TimeKeepingRec."Start Date" := Rec."Start Date";
+                TimeKeepingRec.Validate("Start Date", Rec."Start Date");
             if TimeKeepingRec."Start Time" = 0T then
-                TimeKeepingRec."Start Time" := Rec."Start Time";
+                TimeKeepingRec.Validate("Start Time", Rec."Start Time");
             if TimeKeepingRec."End Date" = 0D then
-                TimeKeepingRec."End Date" := Rec."End Date";
+                TimeKeepingRec.Validate("End Date", Rec."End Date");
             if TimeKeepingRec."End Time" = 0T then
-                TimeKeepingRec."End Time" := Rec."End Time";
+                TimeKeepingRec.Validate("End Time", Rec."End Time");
             if TimeKeepingRec."Original Document No." = '' then
-                TimeKeepingRec."Original Document No." := Rec."Document No.";
+                TimeKeepingRec.Validate("Original Document No.", Rec."Document No.");
             if TimeKeepingRec."Original Line No." = 0 then
-                TimeKeepingRec."Original Line No." := Rec."Line No.";
+                TimeKeepingRec.Validate("Original Line No.", Rec."Line No.");
             if TimeKeepingRec."Original Ship-to Code" = '' then
-                TimeKeepingRec."Original Ship-to Code" := Rec."Original Ship-to Code";
+                TimeKeepingRec.Validate("Original Ship-to Code", Rec."Original Ship-to Code");
             if TimeKeepingRec."Time Worked" = 0 then
-                TimeKeepingRec."Time Worked" := Rec."H2O Time Worked";
+                TimeKeepingRec.Validate("Time Worked", Rec."H2O Time Worked");
 
             TimeKeepingRec.Modify();
         end;

@@ -22,12 +22,19 @@ codeunit 52100 "H2O Event Subscribers"
     local procedure OnAfterSalesLineInsert(var Rec: Record "Sales Line")
     var
         GeneralFunctions: Codeunit "H2O General Functions";
+        TimeKeepingTableRec: Record "H2O Time Keeping Table";
     begin
         IF Rec.Type = Rec.Type::Resource then
             If Res.get(Rec."No.") then begin
                 Rec.validate("Work Type Code", Res."Work Type Code");
                 Rec.validate("WO Supervisor", Res.Supervisor);
                 Rec.validate("Resource Type", Res.Type);
+                TimeKeepingTableRec.SetRange("Document Type", Rec."Document Type");
+                TimeKeepingTableRec.SetRange("Document No.", Rec."Document No.");
+                TimeKeepingTableRec.SetRange("Line No.", Rec."Line No.");
+                if TimeKeepingTableRec.FindFirst() then
+                    Error('Time Keeping Record already exists for Work Order %1 with Line No. %2', Rec."Document No.", Rec."Line No.");
+
                 GeneralFunctions.InsertRecordInTimeKeepingTable(Rec);
             end;
     end;
@@ -38,6 +45,22 @@ codeunit 52100 "H2O Event Subscribers"
         GeneralFunctions: Codeunit "H2O General Functions";
     begin
         GeneralFunctions.ModifyRecordInTimeKeepingTable(Rec);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnBeforeDeleteEvent', '', false, false)]
+    local procedure OnBeforeDeleteSalesLine(var Rec: Record "Sales Line")
+    var
+        TimeKeepingTableRec: Record "H2O Time Keeping Table";
+    begin
+        IF Rec.Type = Rec.Type::Resource then
+            If Res.get(Rec."No.") then begin
+                TimeKeepingTableRec.SetRange("Document Type", Rec."Document Type");
+                TimeKeepingTableRec.SetRange("Document No.", Rec."Document No.");
+                TimeKeepingTableRec.SetRange("Line No.", Rec."Line No.");
+                if TimeKeepingTableRec.FindFirst() then
+                    Error('Cannot delete Work Order %1 with Line No. %2, Already entry exists in TimeKeeping Table', Rec."Document No.", Rec."Line No.");
+            end;
+
     end;
 
     var
