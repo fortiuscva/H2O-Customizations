@@ -160,10 +160,11 @@ table 52100 "H2O Time Keeping Table"
             DataClassification = ToBeClassified;
             Caption = 'Entry No.';
         }
-        field(52206; "Payroll Code Type"; Text[50])
+        field(52206; "Payroll Code Type"; Option)
         {
             DataClassification = ToBeClassified;
             Caption = 'Payroll Code Type';
+            OptionMembers = " ",Earnings,Deduction,Withholding,"Employer Tax","Direct Deposit",Payment,,"Employer Contribut.",Reimbursement,"Advance / Loan";
             TableRelation = "USPY Payroll Code".Type;
         }
     }
