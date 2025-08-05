@@ -165,8 +165,7 @@ table 52100 "H2O Time Keeping Table"
             DataClassification = ToBeClassified;
             Caption = 'Payroll Code Type';
             OptionMembers = " ",Earnings,Deduction,Withholding,"Employer Tax","Direct Deposit",Payment,,"Employer Contribut.",Reimbursement,"Advance / Loan";
-            OptionCaption = '" ",Earnings,Deduction,Withholding,"Employer Tax","Direct Deposit",Payment,,"Employer Contribut.",Reimbursement,"Advance / Loan"';
-            TableRelation = "USPY Payroll Code".Type;
+            OptionCaption = ' ,Earnings,Deduction,Withholding,Employer Tax,Direct Deposit,Payment,,Employer Contribut.,Reimbursement,Advance / Loan';
         }
     }
 
