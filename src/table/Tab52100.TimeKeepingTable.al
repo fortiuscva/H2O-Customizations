@@ -145,7 +145,7 @@ table 52100 "H2O Time Keeping Table"
         {
             Caption = 'Payroll Code';
             DataClassification = ToBeClassified;
-            TableRelation = "USPY Payroll Code".Code;
+            TableRelation = "USPY Payroll Code".Code WHERE("Type" = field("Payroll Code Type"));
         }
 
         field(52204; "Payroll Description"; Text[100])
