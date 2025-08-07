@@ -61,14 +61,6 @@ page 52100 "H2O Time Keeping Table"
                 {
                     ToolTip = 'Specifies the value of the Original Line No. field.', Comment = '%';
                 }
-                field("End Date"; Rec."End Date")
-                {
-                    ToolTip = 'Specifies the value of the End Date field.', Comment = '%';
-                }
-                field("End Time"; Rec."End Time")
-                {
-                    ToolTip = 'Specifies the value of the End Time field.', Comment = '%';
-                }
                 field("Start Date"; Rec."Start Date")
                 {
                     ToolTip = 'Specifies the value of the Start Date field.', Comment = '%';
@@ -76,6 +68,14 @@ page 52100 "H2O Time Keeping Table"
                 field("Start Time"; Rec."Start Time")
                 {
                     ToolTip = 'Specifies the value of the Start Time field.', Comment = '%';
+                }
+                field("End Date"; Rec."End Date")
+                {
+                    ToolTip = 'Specifies the value of the End Date field.', Comment = '%';
+                }
+                field("End Time"; Rec."End Time")
+                {
+                    ToolTip = 'Specifies the value of the End Time field.', Comment = '%';
                 }
                 field("Time Worked"; Rec."Time Worked")
                 {
