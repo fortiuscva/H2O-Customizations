@@ -159,6 +159,7 @@ table 52100 "H2O Time Keeping Table"
         {
             DataClassification = ToBeClassified;
             Caption = 'Entry No.';
+            AutoIncrement = true;
         }
         field(52206; "Payroll Code Type"; Option)
         {
