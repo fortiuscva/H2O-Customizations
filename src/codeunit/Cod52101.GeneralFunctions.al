@@ -11,12 +11,12 @@ codeunit 52101 "H2O General Functions"
         NewEntryNumber: Text[20];
         NextEntryNo: Integer;
     begin
-        TimeKeepingRec.Reset();
-        TimeKeepingRec.SetCurrentKey("Entry No.");
-        if TimeKeepingRec.FindLast() then
-            NextEntryNo := TimeKeepingRec."Entry No." + 1
-        else
-            NextEntryNo := 1;
+        // TimeKeepingRec.Reset();
+        // TimeKeepingRec.SetCurrentKey("Entry No.");
+        // if TimeKeepingRec.FindLast() then
+        //     NextEntryNo := TimeKeepingRec."Entry No." + 1
+        // else
+        //     NextEntryNo := 1;
         CurrentYear := Format(Date2DMY(TODAY, 3));
         InsertTimeKeepingRecord := false;
         if (Rec.Type = Rec.Type::Resource) and (Rec."Resource Type" = Rec."Resource Type"::Person) then
@@ -36,8 +36,8 @@ codeunit 52101 "H2O General Functions"
             NewEntryNumber := Format(CurrentYear) + Format(NewNo);
 
             TimeKeepingRec.Init();
-            TimeKeepingRec.Validate("Entry No.", NextEntryNo);
-            TimeKeepingRec.Insert();
+            //TimeKeepingRec.Validate("Entry No.", NextEntryNo);
+            // TimeKeepingRec.Insert(true);
 
             TimeKeepingRec.Validate("Document Type", Rec."Document Type");
             TimeKeepingRec.Validate("Document No.", Rec."Document No.");
@@ -60,7 +60,8 @@ codeunit 52101 "H2O General Functions"
             TimeKeepingRec.Validate("Original Ship-to Code", Rec."Original Ship-to Code");
             TimeKeepingRec.Validate("Time Worked", Rec."H2O Time Worked");
             TimeKeepingRec.Validate("Entry Number", NewEntryNumber);
-            TimeKeepingRec.Modify();
+            // TimeKeepingRec.Modify();
+            TimeKeepingRec.Insert(true);
         end;
     end;
 
