@@ -190,8 +190,13 @@ table 52100 "H2O Time Keeping Table"
         myInt: Integer;
 
     trigger OnInsert()
+    var
+        TimeKeepingTableRecLcl: Record "H2O Time Keeping Table";
     begin
-
+        if TimeKeepingTableRecLcl.FindLast() then
+            "Entry No." := TimeKeepingTableRecLcl."Entry No." + 1
+        else
+            "Entry No." := 1;
     end;
 
     trigger OnModify()
