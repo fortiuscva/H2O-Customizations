@@ -16,6 +16,12 @@
       "name": "H2O-01",
       "version": "1.0.0.8",
       "publisher": "Impact Networking"
+    },
+    {
+      "id": "a8ec3a17-0410-4858-be04-dea9241f531c",
+      "name": "Primo Payday",
+      "version": "25.42.1.0",
+      "publisher": "Primo Payday"
     }
   ],
   "screenshots": [],
