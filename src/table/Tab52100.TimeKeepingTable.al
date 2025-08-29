@@ -190,8 +190,28 @@ table 52100 "H2O Time Keeping Table"
         myInt: Integer;
 
     trigger OnInsert()
+    var
+        TimeKeepingTableRecLcl: Record "H2O Time Keeping Table";
+        LastEntryNumber: Text[20];
+        LastNo: Integer;
+        CurrentYear: Text[4];
+        NewNo: Integer;
     begin
+        if TimeKeepingTableRecLcl.FindLast() then
+            "Entry No." := TimeKeepingTableRecLcl."Entry No." + 1
+        else
+            "Entry No." := 1;
+        CurrentYear := Format(Date2DMY(TODAY, 3));
+        TimeKeepingTableRecLcl.SetFilter("Entry Number", Format(CurrentYear) + '*');
+        if TimeKeepingTableRecLcl.FindLast() then begin
+            LastEntryNumber := TimeKeepingTableRecLcl."Entry Number";
+            if not EVALUATE(LastNo, CopyStr(LastEntryNumber, 5)) then
+                LastNo := 0;
+        end else
+            LastNo := 0;
 
+        NewNo := LastNo + 1;
+        Rec."Entry Number" := Format(CurrentYear) + Format(NewNo);
     end;
 
     trigger OnModify()
