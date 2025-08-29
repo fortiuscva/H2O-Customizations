@@ -9,15 +9,13 @@ tableextension 52100 "H2O Sales Header" extends "sales header"
                 Rec.Validate("Work Order Type Code", Rec."Shortcut Dimension 2 Code");
             end;
         }
-<<<<<<< HEAD
         modify("Work Order Type Code")
         {
             trigger OnAfterValidate()
             begin
                 Rec.Validate("Shortcut Dimension 2 Code", Rec."Work Order Type Code");
             end;
-
-=======
+        }
         field(52100; "H2O Route No."; Integer)
         {
             Caption = 'Route No.';
@@ -32,7 +30,6 @@ tableextension 52100 "H2O Sales Header" extends "sales header"
             fieldclass = FlowField;
             calcformula = lookup("Ship-to Address"."Location Stop" where("Customer No." = field("Sell-to Customer No."), Code = field("Ship-to Code")));
             editable = false;
->>>>>>> 3de5270 (H20-004 - Route number visibility)
         }
     }
 
