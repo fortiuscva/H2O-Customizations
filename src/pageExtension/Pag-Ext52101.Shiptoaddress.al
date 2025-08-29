@@ -23,7 +23,7 @@ pageextension 52101 "H2O Ship-to address" extends "Ship-to address"
                 ApplicationArea = all;
             }
         }
-        addlast(General)
+        addafter(Code)
         {
             field("H2O Temporary Property No."; Rec."H2O Temporary Property No.")
             {

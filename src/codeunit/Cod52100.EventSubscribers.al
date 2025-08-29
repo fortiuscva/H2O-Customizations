@@ -1,77 +1,45 @@
 codeunit 52100 "H2O Event Subscribers"
 {
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", OnBeforeCreateDimensionsFromValidateBillToCustomerNo, '', false, false)]
+    local procedure "Sales Header_OnBeforeCreateDimensionsFromValidateBillToCustomerNo"(var SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
+    begin
+        SalesHeader.Validate("Work Order Type Code", SalesHeader."Shortcut Dimension 2 Code");
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", OnShowDocDimOnBeforeUpdateSalesLines, '', false, false)]
+    local procedure "Sales Header_OnShowDocDimOnBeforeUpdateSalesLines"(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header")
+    begin
+        SalesHeader.Validate("Work Order Type Code", SalesHeader."Shortcut Dimension 2 Code");
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", OnAfterValidateShortcutDimCode, '', false, false)]
+    local procedure "Sales Header_OnAfterValidateShortcutDimCode"(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header"; FieldNumber: Integer; var ShortcutDimCode: Code[20])
+    begin
+        SalesHeader.Validate("Work Order Type Code", SalesHeader."Shortcut Dimension 2 Code")
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterInsertEvent', '', false, false)]
     local procedure OnAfterSalesLineInsert(var Rec: Record "Sales Line")
     var
-        TimeKeepingRec: Record "H2O Time Keeping Table";
+        GeneralFunctions: Codeunit "H2O General Functions";
     begin
-        TimeKeepingRec.Init();
-        TimeKeepingRec."Document Type" := Rec."Document Type";
-        TimeKeepingRec."Document No." := Rec."Document No.";
-        TimeKeepingRec."Line No." := Rec."Line No.";
-        TimeKeepingRec."Sell-to Customer No." := Rec."Sell-to Customer No.";
-        TimeKeepingRec.Type := Rec.Type;
-        TimeKeepingRec."No." := Rec."No.";
-        TimeKeepingRec.Description := Rec.Description;
-        TimeKeepingRec.Quantity := Rec.Quantity;
-        TimeKeepingRec."Unit Price" := Rec."Unit Price";
-        TimeKeepingRec."Shortcut Dimension 1 Code" := Rec."Shortcut Dimension 1 Code";
-        TimeKeepingRec."Shortcut Dimension 2 Code" := Rec."Shortcut Dimension 2 Code";
-        TimeKeepingRec."Unit of Measure Code" := Rec."Unit of Measure Code";
-        TimeKeepingRec."Start Date" := Rec."Start Date";
-        TimeKeepingRec."Start Time" := Rec."Start Time";
-        TimeKeepingRec."End Date" := Rec."End Date";
-        TimeKeepingRec."End Time" := Rec."End Time";
-        TimeKeepingRec."Original Document No." := Rec."Document No.";
-        TimeKeepingRec."Original Line No." := Rec."Line No.";
-        TimeKeepingRec."Original Ship-to Code" := Rec."Original Ship-to Code";
-        TimeKeepingRec."Time Worked" := Rec."H2O Time Worked";
-        TimeKeepingRec.Insert();
+        IF Rec.Type = Rec.Type::Resource then
+            If Res.get(Rec."No.") then begin
+                Rec.validate("Work Type Code", Res."Work Type Code");
+                Rec.validate("WO Supervisor", Res.Supervisor);
+                Rec.validate("Resource Type", Res.Type);
+                GeneralFunctions.InsertRecordInTimeKeepingTable(Rec);
+            end;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterModifyEvent', '', false, false)]
     local procedure OnAfterSalesLineModify(var Rec: Record "Sales Line")
     var
-        TimeKeepingRec: Record "H2O Time Keeping Table";
+        GeneralFunctions: Codeunit "H2O General Functions";
     begin
-        if TimeKeepingRec.Get(Rec."Document Type", Rec."Document No.", Rec."Line No.") then begin
-            if TimeKeepingRec."Sell-to Customer No." = '' then
-                TimeKeepingRec."Sell-to Customer No." := Rec."Sell-to Customer No.";
-            if TimeKeepingRec.Type = TimeKeepingRec.Type::" " then
-                TimeKeepingRec.Type := Rec.Type;
-            if TimeKeepingRec."No." = '' then
-                TimeKeepingRec."No." := Rec."No.";
-            if TimeKeepingRec.Description = '' then
-                TimeKeepingRec.Description := Rec.Description;
-            if TimeKeepingRec.Quantity = 0 then
-                TimeKeepingRec.Quantity := Rec.Quantity;
-            if TimeKeepingRec."Unit Price" = 0 then
-                TimeKeepingRec."Unit Price" := Rec."Unit Price";
-            if TimeKeepingRec."Shortcut Dimension 1 Code" = '' then
-                TimeKeepingRec."Shortcut Dimension 1 Code" := Rec."Shortcut Dimension 1 Code";
-            if TimeKeepingRec."Shortcut Dimension 2 Code" = '' then
-                TimeKeepingRec."Shortcut Dimension 2 Code" := Rec."Shortcut Dimension 2 Code";
-            if TimeKeepingRec."Unit of Measure Code" = '' then
-                TimeKeepingRec."Unit of Measure Code" := Rec."Unit of Measure Code";
-            if TimeKeepingRec."Start Date" = 0D then
-                TimeKeepingRec."Start Date" := Rec."Start Date";
-            if TimeKeepingRec."Start Time" = 0T then
-                TimeKeepingRec."Start Time" := Rec."Start Time";
-            if TimeKeepingRec."End Date" = 0D then
-                TimeKeepingRec."End Date" := Rec."End Date";
-            if TimeKeepingRec."End Time" = 0T then
-                TimeKeepingRec."End Time" := Rec."End Time";
-            if TimeKeepingRec."Original Document No." = '' then
-                TimeKeepingRec."Original Document No." := Rec."Document No.";
-            if TimeKeepingRec."Original Line No." = 0 then
-                TimeKeepingRec."Original Line No." := Rec."Line No.";
-            if TimeKeepingRec."Original Ship-to Code" = '' then
-                TimeKeepingRec."Original Ship-to Code" := Rec."Original Ship-to Code";
-            if TimeKeepingRec."Time Worked" = 0 then
-                TimeKeepingRec."Time Worked" := Rec."H2O Time Worked";
-
-            TimeKeepingRec.Modify();
-        end;
+        GeneralFunctions.ModifyRecordInTimeKeepingTable(Rec);
     end;
 
+    var
+        Res: Record Resource;
 }
