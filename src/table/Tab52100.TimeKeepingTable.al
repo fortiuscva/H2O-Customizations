@@ -135,13 +135,49 @@ table 52100 "H2O Time Keeping Table"
             DataClassification = ToBeClassified;
             DecimalPlaces = 0 : 5;
         }
+        field(52202; "Entry Number"; Text[20])
+        {
+            Caption = 'Entry Number';
+            DataClassification = ToBeClassified;
+        }
+
+        field(52203; "Payroll Code"; Code[20])
+        {
+            Caption = 'Payroll Code';
+            DataClassification = ToBeClassified;
+            TableRelation = "USPY Payroll Code".Code WHERE("Type" = field("Payroll Code Type"));
+        }
+
+        field(52204; "Payroll Description"; Text[100])
+        {
+            Caption = 'Payroll Description';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = lookup("USPY Payroll Code".Description where(Code = field("Payroll Code")));
+        }
+        field(52205; "Entry No."; Integer)
+        {
+            DataClassification = ToBeClassified;
+            Caption = 'Entry No.';
+            AutoIncrement = true;
+        }
+        field(52206; "Payroll Code Type"; Option)
+        {
+            DataClassification = ToBeClassified;
+            Caption = 'Payroll Code Type';
+            OptionMembers = " ",Earnings,Deduction,Withholding,"Employer Tax","Direct Deposit",Payment,,"Employer Contribut.",Reimbursement,"Advance / Loan";
+            OptionCaption = ' ,Earnings,Deduction,Withholding,Employer Tax,Direct Deposit,Payment,,Employer Contribut.,Reimbursement,Advance / Loan';
+        }
     }
 
     keys
     {
-        key(Key1; "Document Type", "Document No.", "Line No.")
+        key(key1; "Entry No.")
         {
             Clustered = true;
+        }
+        key(Key2; "Document Type", "Document No.", "Line No.")
+        {
         }
     }
 

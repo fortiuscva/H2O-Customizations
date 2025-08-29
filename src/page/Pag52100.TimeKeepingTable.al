@@ -12,6 +12,11 @@ page 52100 "H2O Time Keeping Table"
         {
             repeater(General)
             {
+                field("Entry No."; Rec."Entry No.")
+                {
+                    ApplicationArea = All;
+                    Visible = false;
+                }
                 field(Type; Rec."Type")
                 {
                     ToolTip = 'Specifies the value of the Type field.', Comment = '%';
@@ -56,14 +61,6 @@ page 52100 "H2O Time Keeping Table"
                 {
                     ToolTip = 'Specifies the value of the Original Line No. field.', Comment = '%';
                 }
-                field("End Date"; Rec."End Date")
-                {
-                    ToolTip = 'Specifies the value of the End Date field.', Comment = '%';
-                }
-                field("End Time"; Rec."End Time")
-                {
-                    ToolTip = 'Specifies the value of the End Time field.', Comment = '%';
-                }
                 field("Start Date"; Rec."Start Date")
                 {
                     ToolTip = 'Specifies the value of the Start Date field.', Comment = '%';
@@ -72,10 +69,40 @@ page 52100 "H2O Time Keeping Table"
                 {
                     ToolTip = 'Specifies the value of the Start Time field.', Comment = '%';
                 }
+                field("End Date"; Rec."End Date")
+                {
+                    ToolTip = 'Specifies the value of the End Date field.', Comment = '%';
+                }
+                field("End Time"; Rec."End Time")
+                {
+                    ToolTip = 'Specifies the value of the End Time field.', Comment = '%';
+                }
                 field("Time Worked"; Rec."Time Worked")
                 {
                     ToolTip = 'Specifies the value of the Time Worked field.', Comment = '%';
                 }
+
+
+                field("Payroll Code Type"; Rec."Payroll Code Type")
+                {
+                    ApplicationArea = all;
+                }
+                field("Payroll Code"; Rec."Payroll Code")
+                {
+                    ApplicationArea = All;
+                }
+
+                field("Payroll Description"; Rec."Payroll Description")
+                {
+                    ApplicationArea = All;
+                    Editable = false;
+                }
+                field("Entry Number"; Rec."Entry Number")
+                {
+                    ApplicationArea = All;
+                }
+
+
             }
         }
     }
