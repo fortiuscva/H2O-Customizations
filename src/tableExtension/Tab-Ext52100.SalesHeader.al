@@ -32,6 +32,4 @@ tableextension 52100 "H2O Sales Header" extends "sales header"
             editable = false;
         }
     }
-
-
 }
