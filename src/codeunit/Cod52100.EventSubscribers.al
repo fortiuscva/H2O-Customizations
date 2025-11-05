@@ -1,5 +1,6 @@
 codeunit 52100 "H2O Event Subscribers"
 {
+    SingleInstance = true;
     [EventSubscriber(ObjectType::Table, Database::"Sales Header", OnBeforeCreateDimensionsFromValidateBillToCustomerNo, '', false, false)]
     local procedure "Sales Header_OnBeforeCreateDimensionsFromValidateBillToCustomerNo"(var SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
     begin
@@ -24,6 +25,8 @@ codeunit 52100 "H2O Event Subscribers"
         GeneralFunctions: Codeunit "H2O General Functions";
         TimeKeepingTableRec: Record "H2O Time Keeping Table";
     begin
+        if SalesPostBoolean_Grec then
+            exit;
         IF Rec.Type = Rec.Type::Resource then
             If Res.get(Rec."No.") then begin
                 Rec.validate("Work Type Code", Res."Work Type Code");
@@ -44,6 +47,8 @@ codeunit 52100 "H2O Event Subscribers"
     var
         GeneralFunctions: Codeunit "H2O General Functions";
     begin
+        if SalesPostBoolean_Grec then
+            exit;
         GeneralFunctions.ModifyRecordInTimeKeepingTable(Rec);
     end;
 
@@ -52,6 +57,8 @@ codeunit 52100 "H2O Event Subscribers"
     var
         TimeKeepingTableRec: Record "H2O Time Keeping Table";
     begin
+        if SalesPostBoolean_Grec then
+            exit;
         IF Rec.Type = Rec.Type::Resource then
             If Res.get(Rec."No.") then begin
                 TimeKeepingTableRec.SetRange("Document Type", Rec."Document Type");
@@ -61,8 +68,22 @@ codeunit 52100 "H2O Event Subscribers"
                     Error('Cannot delete Work Order %1 with Line No. %2, Already entry exists in TimeKeeping Table', Rec."Document No.", Rec."Line No.");
             end;
 
+
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", OnBeforePostSalesDoc, '', false, false)]
+    local procedure OnBeforePostSalesDoc()
+    begin
+        SalesPostBoolean_Grec := true;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", OnAfterPostSalesDoc, '', false, false)]
+    local procedure OnAfterPostSalesDoc()
+    begin
+        Clear(SalesPostBoolean_Grec);
     end;
 
     var
         Res: Record Resource;
+        SalesPostBoolean_Grec: Boolean;
 }
