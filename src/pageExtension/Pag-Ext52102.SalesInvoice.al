@@ -23,6 +23,11 @@ pageextension 52102 "H2O Sales Invoice" extends "Sales Invoice"
                 ApplicationArea = all;
                 Caption = 'WOComments';
             }
+            field("H2O SystemModifiedAt"; Rec.SystemModifiedAt)
+            {
+                Caption = 'System Modified At';
+                ApplicationArea = All;
+            }
         }
     }
     trigger OnOpenPage()
