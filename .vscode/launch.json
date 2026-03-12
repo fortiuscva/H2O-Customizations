@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "SandBox_DEV_060224",
+            "name": "Sandbox",
             "request": "launch",
             "type": "al",
             "tenant": "cadb3c49-8349-4dfa-a2e5-43d9ba8609f0",
