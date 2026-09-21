@@ -112,4 +112,130 @@ codeunit 52101 "H2O General Functions"
             TimeKeepingRec.Modify();
         end;
     end;
+
+    procedure GetPurchaseOrder(var WorkOrder: Record "Sales Header")
+    var
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        Vendor: Record Vendor;
+        WorkOrderLine: Record "Sales Line";
+        LineNo: Integer;
+        ImportedLines: Integer;
+        SkippedLines: Integer;
+    begin
+        // Validate Purchase Order No.
+        WorkOrder.TestField("H2O Purchase Order No.");
+
+        // Get Purchase Order Header
+        if not PurchaseHeader.Get(
+            PurchaseHeader."Document Type"::Order,
+            WorkOrder."H2O Purchase Order No.")
+        then
+            Error(
+                'Purchase Order %1 does not exist.',
+                WorkOrder."H2O Purchase Order No.");
+
+        // Get Vendor
+        // if PurchaseHeader."Buy-from Vendor No." <> '' then begin
+        //     if Vendor.Get(PurchaseHeader."Buy-from Vendor No.") then begin
+        //         WorkOrder.Validate(
+        //             "Vendor No.",
+        //             PurchaseHeader."Buy-from Vendor No.");
+
+        //         WorkOrder.Validate(
+        //             "Vendor Name",
+        //             Vendor.Name);
+        //     end;
+        // end;
+
+        // Save Work Order Header
+        WorkOrder.Modify(true);
+
+        // Get Purchase Order Lines
+        PurchaseLine.Reset();
+        PurchaseLine.SetRange(
+            "Document Type",
+            PurchaseHeader."Document Type");
+
+        PurchaseLine.SetRange(
+            "Document No.",
+            PurchaseHeader."No.");
+
+        if not PurchaseLine.FindSet() then
+            Error(
+                'Purchase Order %1 does not contain any lines.',
+                PurchaseHeader."No.");
+
+        // Find last existing Work Order Line
+        WorkOrderLine.Reset();
+        WorkOrderLine.SetRange(
+            "Document No.",
+            WorkOrder."No.");
+
+        if WorkOrderLine.FindLast() then
+            LineNo := WorkOrderLine."Line No." + 10000
+        else
+            LineNo := 10000;
+
+        repeat
+
+            // Only Item lines can be transferred
+            //  if PurchaseLine.Type = PurchaseLine.Type::Item then begin
+            WorkOrderLine.Reset();
+            WorkOrderLine.SetRange(
+                "Document Type",
+                WorkOrder."Document Type");
+
+            WorkOrderLine.SetRange("Document No.", WorkOrder."No.");
+
+            WorkOrderLine.SetRange(Type, PurchaseLine.Type);
+
+            WorkOrderLine.SetRange("No.", PurchaseLine."No.");
+
+            if WorkOrderLine.FindFirst() then begin
+                SkippedLines += 1;
+            end
+            else begin
+                // Item No. must exist
+                if PurchaseLine."No." = '' then
+                    Error('Purchase Order %1, Line %2 must have an Item No.',
+                        PurchaseLine."Document No.",
+                        PurchaseLine."Line No.");
+
+                // Create Work Order Line
+                WorkOrderLine.Init();
+                WorkOrderLine."Document Type" := WorkOrder."Document Type";
+                WorkOrderLine."Document No." := WorkOrder."No.";
+                WorkOrderLine."Line No." := LineNo;
+                WorkOrderLine.Insert(true);
+                WorkOrderLine.Validate(Type, PurchaseLine.Type);
+                WorkOrderLine.Validate("No.", PurchaseLine."No.");
+                WorkOrderLine.Validate(Description, PurchaseLine.Description);
+                WorkOrderLine.Validate(Quantity, PurchaseLine.Quantity);
+                WorkOrderLine.Validate("Unit Cost", PurchaseLine."Direct Unit Cost");
+                WorkOrderLine.Validate("H2O Vendor No.", PurchaseLine."Pay-to Vendor No.");
+                WorkOrderLine.Validate("H2O Vendor PO", PurchaseLine."Document No.");
+                WorkOrderLine.Validate("H2O PO Amount", PurchaseLine."Line Amount");
+                WorkOrderLine.Modify(true);
+
+                LineNo += 10000;
+                ImportedLines += 1;
+            end;
+
+        until PurchaseLine.Next() = 0;
+
+        if SkippedLines > 0 then
+            Message(
+                'Purchase Order %1 was successfully retrieved. %2 new line(s) were added and %3 existing line(s) were skipped.',
+                PurchaseHeader."No.",
+                ImportedLines,
+                SkippedLines)
+        else
+            Message(
+                'Purchase Order %1 was successfully retrieved. %2 line(s) were added to Work Order %3.',
+                PurchaseHeader."No.",
+                ImportedLines,
+                WorkOrder."No.");
+    end;
+
 }
