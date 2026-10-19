@@ -83,7 +83,33 @@ codeunit 52100 "H2O Event Subscribers"
         Clear(SalesPostBoolean_Grec);
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"Cust. Ledger Entry", OnAfterCopyCustLedgerEntryFromGenJnlLine, '', false, false)]
+    local procedure "Cust. Ledger Entry_OnAfterCopyCustLedgerEntryFromGenJnlLine"(var CustLedgerEntry: Record "Cust. Ledger Entry"; GenJournalLine: Record "Gen. Journal Line")
+    var
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+    begin
+        if GenJournalLine."Document Type" = GenJournalLine."Document Type"::Invoice then begin
+            if SalesInvoiceHeader.Get(GenJournalLine."Document No.") then
+                CustLedgerEntry."H2O Purchase Order No." := SalesInvoiceHeader."H2O Purchase Order No.";
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"VendEntry-Apply Posted Entries", OnBeforePostApplyVendLedgEntry, '', false, false)]
+    local procedure "VendEntry-Apply Posted Entries_OnBeforePostApplyVendLedgEntry"(var GenJournalLine: Record "Gen. Journal Line"; VendorLedgerEntry: Record "Vendor Ledger Entry"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; ApplyUnapplyParameters: Record "Apply Unapply Parameters")
+    begin
+        //     GeneralFunctions.ValidateVendorPayment(VendorLedgerEntry);
+
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Gen. Jnl.-Post Line", OnBeforePostGenJnlLine, '', false, false)]
+    local procedure "Gen. Jnl.-Post Line_OnBeforePostGenJnlLine"(var Sender: Codeunit "Gen. Jnl.-Post Line"; var GenJournalLine: Record "Gen. Journal Line"; Balancing: Boolean)
+    begin
+        GeneralFunctions.ValidateH2OVendorPayment(GenJournalLine);
+    end;
+
+
     var
         Res: Record Resource;
         SalesPostBoolean_Grec: Boolean;
+        GeneralFunctions: Codeunit "H2O General Functions";
 }

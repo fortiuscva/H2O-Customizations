@@ -34,6 +34,7 @@ pageextension 52102 "H2O Sales Invoice" extends "Sales Invoice"
                 ToolTip = 'Specifies the value of the Purchase Order No. field.', Comment = '%';
             }
         }
+
     }
     actions
     {
