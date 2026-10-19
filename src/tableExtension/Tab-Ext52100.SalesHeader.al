@@ -26,5 +26,11 @@ tableextension 52100 "H2O Sales Header" extends "sales header"
             calcformula = lookup("Ship-to Address"."Location Stop" where("Customer No." = field("Sell-to Customer No."), Code = field("Ship-to Code")));
             editable = false;
         }
+        field(52102; "H2O Purchase Order No."; Code[20])
+        {
+            Caption = 'Purchase Order No.';
+            DataClassification = ToBeClassified;
+            TableRelation = "Purchase Header"."No." where("Document Type" = const(Order));
+        }
     }
 }

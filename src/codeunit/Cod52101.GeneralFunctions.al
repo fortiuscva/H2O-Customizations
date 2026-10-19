@@ -112,4 +112,231 @@ codeunit 52101 "H2O General Functions"
             TimeKeepingRec.Modify();
         end;
     end;
+
+    procedure GetPurchaseOrder(var WorkOrder: Record "Sales Header")
+    var
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        Vendor: Record Vendor;
+        WorkOrderLine: Record "Sales Line";
+        LineNo: Integer;
+        ImportedLines: Integer;
+        SkippedLines: Integer;
+    begin
+        // Validate Purchase Order No.
+        WorkOrder.TestField("H2O Purchase Order No.");
+
+        // Get Purchase Order Header
+        if not PurchaseHeader.Get(PurchaseHeader."Document Type"::Order, WorkOrder."H2O Purchase Order No.")
+        then
+            Error('Purchase Order %1 does not exist.', WorkOrder."H2O Purchase Order No.");
+
+        // Get Vendor
+        // if PurchaseHeader."Buy-from Vendor No." <> '' then begin
+        //     if Vendor.Get(PurchaseHeader."Buy-from Vendor No.") then begin
+        //         WorkOrder.Validate(
+        //             "Vendor No.",
+        //             PurchaseHeader."Buy-from Vendor No.");
+
+        //         WorkOrder.Validate(
+        //             "Vendor Name",
+        //             Vendor.Name);
+        //     end;
+        // end;
+
+        // Save Work Order Header
+        // WorkOrder.Modify(true);
+
+        // Get Purchase Order Lines
+        PurchaseLine.Reset();
+        PurchaseLine.SetRange("Document Type", PurchaseHeader."Document Type");
+        PurchaseLine.SetRange("Document No.", PurchaseHeader."No.");
+
+        if not PurchaseLine.FindSet() then
+            Error('Purchase Order %1 does not contain any lines.', PurchaseHeader."No.");
+
+        // Find last existing Work Order Line
+        WorkOrderLine.Reset();
+        WorkOrderLine.SetRange("Document No.", WorkOrder."No.");
+
+        if WorkOrderLine.FindLast() then
+            LineNo := WorkOrderLine."Line No." + 10000
+        else
+            LineNo := 10000;
+
+        repeat
+            WorkOrderLine.Reset();
+            WorkOrderLine.SetRange("Document Type", WorkOrder."Document Type");
+            WorkOrderLine.SetRange("Document No.", WorkOrder."No.");
+            WorkOrderLine.SetRange("Purch. Order Line No.", PurchaseLine."Line No.");
+
+            if WorkOrderLine.FindFirst() then begin
+                SkippedLines += 1;
+            end
+            else begin
+                if PurchaseLine."No." = '' then
+                    Error('Purchase Order %1, Line %2 must have an Item No.',
+                        PurchaseLine."Document No.",
+                        PurchaseLine."Line No.");
+
+                // Create Work Order Line
+                WorkOrderLine.Init();
+                WorkOrderLine."Document Type" := WorkOrder."Document Type";
+                WorkOrderLine."Document No." := WorkOrder."No.";
+                WorkOrderLine."Line No." := LineNo;
+                WorkOrderLine.Insert(true);
+                WorkOrderLine.Validate(Type, PurchaseLine.Type);
+                WorkOrderLine.Validate("No.", PurchaseLine."No.");
+                WorkOrderLine.Validate(Description, PurchaseLine.Description);
+                WorkOrderLine.Validate(Quantity, PurchaseLine.Quantity);
+                WorkOrderLine.Validate("Unit Cost", PurchaseLine."Direct Unit Cost");
+                WorkOrderLine.Validate("H2O Vendor No.", PurchaseLine."Pay-to Vendor No.");
+                WorkOrderLine.Validate("H2O Vendor PO", PurchaseLine."Document No.");
+                WorkOrderLine.Validate("H2O PO Amount", PurchaseLine."Line Amount");
+                WorkOrderLine.Validate("Purch. Order Line No.", PurchaseLine."Line No.");
+                WorkOrderLine.Validate("Purchase Order No.", PurchaseLine."Document No.");
+                WorkOrderLine.Modify(true);
+
+                LineNo += 10000;
+                ImportedLines += 1;
+            end;
+
+        until PurchaseLine.Next() = 0;
+
+        if SkippedLines > 0 then
+            Message(
+                'Purchase Order %1 was successfully retrieved. %2 new line(s) were added and %3 existing line(s) were skipped.',
+                PurchaseHeader."No.",
+                ImportedLines,
+                SkippedLines)
+        else
+            Message(
+                'Purchase Order %1 was successfully retrieved. %2 line(s) were added to Work Order %3.',
+                PurchaseHeader."No.",
+                ImportedLines,
+                WorkOrder."No.");
+    end;
+
+    procedure ValidateH2OVendorPayment(GenJournalLine: Record "Gen. Journal Line")
+    var
+        VendorLedgerEntry: Record "Vendor Ledger Entry";
+        Vendor: Record Vendor;
+    begin
+        if GenJournalLine."Account Type" <> GenJournalLine."Account Type"::Vendor then
+            exit;
+
+        if GenJournalLine."Document Type" <> GenJournalLine."Document Type"::Payment then
+            exit;
+
+        if GenJournalLine."Account No." = '' then
+            exit;
+
+        if not Vendor.Get(GenJournalLine."Account No.") then
+            exit;
+
+
+        if GenJournalLine."Applies-to Doc. No." <> '' then begin
+
+            VendorLedgerEntry.Reset();
+            VendorLedgerEntry.SetRange("Vendor No.",
+                GenJournalLine."Account No.");
+            VendorLedgerEntry.SetRange("Document No.", GenJournalLine."Applies-to Doc. No.");
+
+            if VendorLedgerEntry.FindFirst() then
+                ValidateH2OPurchaseInvoice(VendorLedgerEntry."Document No.", GenJournalLine."Account No.");
+
+            exit;
+        end;
+
+        if GenJournalLine."Applies-to ID" <> '' then begin
+
+            VendorLedgerEntry.Reset();
+            VendorLedgerEntry.SetRange("Vendor No.", GenJournalLine."Account No.");
+            VendorLedgerEntry.SetRange("Applies-to ID", GenJournalLine."Applies-to ID");
+            VendorLedgerEntry.SetRange(Open, true);
+
+            if VendorLedgerEntry.FindSet() then
+                repeat
+                    ValidateH2OPurchaseInvoice(VendorLedgerEntry."Document No.", GenJournalLine."Account No.");
+                until VendorLedgerEntry.Next() = 0;
+
+            exit;
+        end;
+    end;
+
+    procedure ValidateH2OVendorPaymentFromVendorLedgerEntry(VendorLedgerEntry: Record "Vendor Ledger Entry")
+    begin
+        if VendorLedgerEntry."Document No." = '' then
+            exit;
+
+        ValidateH2OPurchaseInvoice(VendorLedgerEntry."Document No.", VendorLedgerEntry."Vendor No.");
+    end;
+
+    procedure ValidateH2OPurchaseInvoice(PurchaseInvoiceNo: Code[20]; VendorNo: Code[20])
+    var
+        PurchInvHeader: Record "Purch. Inv. Header";
+        PurchaseOrderNo: Code[20];
+    begin
+        if PurchaseInvoiceNo = '' then
+            exit;
+
+        PurchInvHeader.Reset();
+        PurchInvHeader.SetRange("No.", PurchaseInvoiceNo);
+
+        if not PurchInvHeader.FindFirst() then
+            exit;
+
+
+        if (VendorNo <> '') and
+           (PurchInvHeader."Buy-from Vendor No." <> VendorNo) then
+            exit;
+
+        PurchaseOrderNo := PurchInvHeader."Order No.";
+
+        if (PurchaseOrderNo = '') and (not PurchInvHeader."H2O ByPass Work Order Payment") then
+            exit;
+
+        ValidateH2OCustomerPayment(PurchaseOrderNo);
+    end;
+
+    procedure ValidateH2OCustomerPayment(PurchaseOrderNo: Code[20])
+    var
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        CustLedgerEntry: Record "Cust. Ledger Entry";
+        FoundSalesInvoice: Boolean;
+    begin
+        if PurchaseOrderNo = '' then
+            exit;
+
+        SalesInvoiceHeader.Reset();
+        SalesInvoiceHeader.SetRange(
+            "H2O Purchase Order No.",
+            PurchaseOrderNo);
+
+        if not SalesInvoiceHeader.FindSet() then
+            exit;
+
+        repeat
+            FoundSalesInvoice := true;
+
+            CustLedgerEntry.Reset();
+            CustLedgerEntry.SetRange("Document No.", SalesInvoiceHeader."No.");
+            CustLedgerEntry.SetRange("Customer No.", SalesInvoiceHeader."Bill-to Customer No.");
+
+            if CustLedgerEntry.FindSet() then
+                repeat
+                    if CustLedgerEntry.Open then
+                        Error('Vendor payment cannot be posted.\' +
+                            'Work order payment have not received\' +
+                            ' Purchase Order No.: %1\' +
+                            ' Sales Invoice No.: %2\' +
+                            ' Customer No.: %3.',
+                            PurchaseOrderNo,
+                            SalesInvoiceHeader."No.",
+                            CustLedgerEntry."Customer No.");
+
+                until CustLedgerEntry.Next() = 0;
+
+        until SalesInvoiceHeader.Next() = 0;
+    end;
 }

@@ -28,8 +28,37 @@ pageextension 52102 "H2O Sales Invoice" extends "Sales Invoice"
                 Caption = 'System Modified At';
                 ApplicationArea = All;
             }
+            field("H2O Purchase Order No."; Rec."H2O Purchase Order No.")
+            {
+                ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Purchase Order No. field.', Comment = '%';
+            }
+        }
+
+    }
+    actions
+    {
+        addlast(Processing)
+        {
+            action("H2O GetPurchaseOrder")
+            {
+                Caption = 'Get Purchase Order';
+                ApplicationArea = All;
+                Image = GetLines;
+                Promoted = true;
+                PromotedCategory = Process;
+                trigger OnAction()
+                var
+                    GeneralFunctions: Codeunit "H2O General Functions";
+                begin
+                    GeneralFunctions.GetPurchaseOrder(Rec);
+
+                    CurrPage.Update(false);
+                end;
+            }
         }
     }
+
     trigger OnOpenPage()
     begin
         CurrPage.Caption('Work Order');

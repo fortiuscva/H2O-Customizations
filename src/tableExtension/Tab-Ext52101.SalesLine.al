@@ -63,6 +63,11 @@ tableextension 52101 "H2O Sales Line" extends "Sales line"
             Caption = 'Meter Size';
             DecimalPlaces = 0 : 3;
         }
+        field(52212; "H2O Purchase Line No."; Integer)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Purchase Line No.';
+        }
     }
 
     /* trigger OnAfterModify()

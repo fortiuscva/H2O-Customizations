@@ -63,4 +63,5 @@ pageextension 52103 "H2O Sales Invoice Subform" extends "Sales Invoice Subform"
             }
         }
     }
+
 }
