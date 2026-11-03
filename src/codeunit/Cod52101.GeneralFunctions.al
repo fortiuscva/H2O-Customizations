@@ -293,7 +293,7 @@ codeunit 52101 "H2O General Functions"
 
         PurchaseOrderNo := PurchInvHeader."Order No.";
 
-        if (PurchaseOrderNo = '') and (not PurchInvHeader."H2O ByPass Work Order Payment") then
+        if PurchInvHeader."H2O ByPass Work Order Payment" then
             exit;
 
         ValidateH2OCustomerPayment(PurchaseOrderNo);

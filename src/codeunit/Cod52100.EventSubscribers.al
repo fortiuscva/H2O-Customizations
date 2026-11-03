@@ -107,6 +107,16 @@ codeunit 52100 "H2O Event Subscribers"
         GeneralFunctions.ValidateH2OVendorPayment(GenJournalLine);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", OnBeforePostDropOrderShipment, '', false, false)]
+    local procedure "Sales-Post_OnBeforePostDropOrderShipment"(var SalesHeader: Record "Sales Header"; var TempDropShptPostBuffer: Record "Drop Shpt. Post. Buffer" temporary)
+    begin
+        if SalesHeader."Document Type" <>
+          SalesHeader."Document Type"::Invoice
+       then
+            exit;
+        TempDropShptPostBuffer.DeleteAll();
+    end;
+
 
     var
         Res: Record Resource;
