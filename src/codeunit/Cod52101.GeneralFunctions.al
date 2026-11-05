@@ -21,7 +21,6 @@ codeunit 52101 "H2O General Functions"
         InsertTimeKeepingRecord := false;
         if (Rec.Type = Rec.Type::Resource) and (Rec."Resource Type" = Rec."Resource Type"::Person) then
             InsertTimeKeepingRecord := true;
-
         if InsertTimeKeepingRecord then begin
 
             // TimeKeepingRec.SetFilter("Entry Number", Format(CurrentYear) + '*');
@@ -72,7 +71,6 @@ codeunit 52101 "H2O General Functions"
         TimeKeepingRec.SetRange("Document Type", Rec."Document Type");
         TimeKeepingRec.SetRange("Document No.", Rec."Document No.");
         TimeKeepingRec.SetRange("Line No.", Rec."Line No.");
-
         if TimeKeepingRec.FindFirst() then begin
             if TimeKeepingRec."Sell-to Customer No." = '' then
                 TimeKeepingRec.Validate("Sell-to Customer No.", Rec."Bill-to Customer No.");
@@ -151,25 +149,22 @@ codeunit 52101 "H2O General Functions"
         PurchaseLine.Reset();
         PurchaseLine.SetRange("Document Type", PurchaseHeader."Document Type");
         PurchaseLine.SetRange("Document No.", PurchaseHeader."No.");
-
         if not PurchaseLine.FindSet() then
             Error('Purchase Order %1 does not contain any lines.', PurchaseHeader."No.");
 
         // Find last existing Work Order Line
         WorkOrderLine.Reset();
         WorkOrderLine.SetRange("Document No.", WorkOrder."No.");
-
         if WorkOrderLine.FindLast() then
             LineNo := WorkOrderLine."Line No." + 10000
         else
             LineNo := 10000;
-
         repeat
             WorkOrderLine.Reset();
             WorkOrderLine.SetRange("Document Type", WorkOrder."Document Type");
             WorkOrderLine.SetRange("Document No.", WorkOrder."No.");
+            WorkOrderLine.SetRange("Purchase Order No.", PurchaseLine."No.");
             WorkOrderLine.SetRange("Purch. Order Line No.", PurchaseLine."Line No.");
-
             if WorkOrderLine.FindFirst() then begin
                 SkippedLines += 1;
             end
@@ -200,9 +195,7 @@ codeunit 52101 "H2O General Functions"
                 LineNo += 10000;
                 ImportedLines += 1;
             end;
-
         until PurchaseLine.Next() = 0;
-
         if SkippedLines > 0 then
             Message(
                 'Purchase Order %1 was successfully retrieved. %2 new line(s) were added and %3 existing line(s) were skipped.',
@@ -224,37 +217,29 @@ codeunit 52101 "H2O General Functions"
     begin
         if GenJournalLine."Account Type" <> GenJournalLine."Account Type"::Vendor then
             exit;
-
         if GenJournalLine."Document Type" <> GenJournalLine."Document Type"::Payment then
             exit;
-
         if GenJournalLine."Account No." = '' then
             exit;
-
         if not Vendor.Get(GenJournalLine."Account No.") then
             exit;
-
-
         if GenJournalLine."Applies-to Doc. No." <> '' then begin
 
             VendorLedgerEntry.Reset();
             VendorLedgerEntry.SetRange("Vendor No.",
                 GenJournalLine."Account No.");
             VendorLedgerEntry.SetRange("Document No.", GenJournalLine."Applies-to Doc. No.");
-
             if VendorLedgerEntry.FindFirst() then
                 ValidateH2OPurchaseInvoice(VendorLedgerEntry."Document No.", GenJournalLine."Account No.");
 
             exit;
         end;
-
         if GenJournalLine."Applies-to ID" <> '' then begin
 
             VendorLedgerEntry.Reset();
             VendorLedgerEntry.SetRange("Vendor No.", GenJournalLine."Account No.");
             VendorLedgerEntry.SetRange("Applies-to ID", GenJournalLine."Applies-to ID");
             VendorLedgerEntry.SetRange(Open, true);
-
             if VendorLedgerEntry.FindSet() then
                 repeat
                     ValidateH2OPurchaseInvoice(VendorLedgerEntry."Document No.", GenJournalLine."Account No.");
@@ -282,17 +267,13 @@ codeunit 52101 "H2O General Functions"
 
         PurchInvHeader.Reset();
         PurchInvHeader.SetRange("No.", PurchaseInvoiceNo);
-
         if not PurchInvHeader.FindFirst() then
             exit;
-
-
         if (VendorNo <> '') and
            (PurchInvHeader."Buy-from Vendor No." <> VendorNo) then
             exit;
 
         PurchaseOrderNo := PurchInvHeader."Order No.";
-
         if PurchInvHeader."H2O ByPass Work Order Payment" then
             exit;
 
@@ -312,17 +293,14 @@ codeunit 52101 "H2O General Functions"
         SalesInvoiceHeader.SetRange(
             "H2O Purchase Order No.",
             PurchaseOrderNo);
-
         if not SalesInvoiceHeader.FindSet() then
             exit;
-
         repeat
             FoundSalesInvoice := true;
 
             CustLedgerEntry.Reset();
             CustLedgerEntry.SetRange("Document No.", SalesInvoiceHeader."No.");
             CustLedgerEntry.SetRange("Customer No.", SalesInvoiceHeader."Bill-to Customer No.");
-
             if CustLedgerEntry.FindSet() then
                 repeat
                     if CustLedgerEntry.Open then
@@ -334,9 +312,7 @@ codeunit 52101 "H2O General Functions"
                             PurchaseOrderNo,
                             SalesInvoiceHeader."No.",
                             CustLedgerEntry."Customer No.");
-
                 until CustLedgerEntry.Next() = 0;
-
         until SalesInvoiceHeader.Next() = 0;
     end;
 }

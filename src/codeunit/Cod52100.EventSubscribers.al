@@ -67,8 +67,6 @@ codeunit 52100 "H2O Event Subscribers"
                 if TimeKeepingTableRec.FindFirst() then
                     Error('Cannot delete Work Order %1 with Line No. %2, Already entry exists in TimeKeeping Table', Rec."Document No.", Rec."Line No.");
             end;
-
-
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", OnBeforePostSalesDoc, '', false, false)]
@@ -117,6 +115,12 @@ codeunit 52100 "H2O Event Subscribers"
         TempDropShptPostBuffer.DeleteAll();
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"Purchase Line", OnAfterValidateNoPurchaseLine, '', false, false)]
+    local procedure "Purchase Line_OnAfterValidateNoPurchaseLine"(var PurchaseLine: Record "Purchase Line"; var xPurchaseLine: Record "Purchase Line"; var TempPurchaseLine: Record "Purchase Line" temporary; PurchaseHeader: Record "Purchase Header")
+    begin
+        if PurchaseLine.Type = PurchaseLine.Type::Item then
+            PurchaseLine.Validate("Direct Unit Cost", 0);
+    end;
 
     var
         Res: Record Resource;
