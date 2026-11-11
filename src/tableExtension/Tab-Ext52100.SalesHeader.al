@@ -31,6 +31,18 @@ tableextension 52100 "H2O Sales Header" extends "sales header"
             Caption = 'Purchase Order No.';
             DataClassification = ToBeClassified;
             TableRelation = "Purchase Header"."No." where("Document Type" = const(Order));
+            trigger OnValidate()
+            var
+                SalesLine: Record "Sales Line";
+                POWOValidation: Codeunit "H2O PO WO Validation";
+            begin
+                SalesLine.SetRange("Document Type", Rec."Document Type");
+                SalesLine.SetRange("Document No.", Rec."No.");
+                if SalesLine.FindSet() then
+                    repeat
+                        POWOValidation.ValidatePOWorkOrderLink(SalesLine);
+                    until SalesLine.Next() = 0;
+            end;
         }
     }
 }

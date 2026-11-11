@@ -19,38 +19,51 @@ codeunit 52100 "H2O Event Subscribers"
         SalesHeader.Validate("Work Order Type Code", SalesHeader."Shortcut Dimension 2 Code")
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterInsertEvent', '', false, false)]
+
+    [EventSubscriber(ObjectType::Table, Database::"Sales Line",
+        'OnAfterInsertEvent', '', false, false)]
     local procedure OnAfterSalesLineInsert(var Rec: Record "Sales Line")
     var
         GeneralFunctions: Codeunit "H2O General Functions";
         TimeKeepingTableRec: Record "H2O Time Keeping Table";
+        POWOValidation: Codeunit "H2O PO WO Validation";
     begin
         if SalesPostBoolean_Grec then
             exit;
-        IF Rec.Type = Rec.Type::Resource then
-            If Res.get(Rec."No.") then begin
-                Rec.validate("Work Type Code", Res."Work Type Code");
-                Rec.validate("WO Supervisor", Res.Supervisor);
-                Rec.validate("Resource Type", Res.Type);
+
+        // Validate duplicate PO line allocation
+        POWOValidation.ValidatePOWorkOrderLink(Rec);
+        if Rec.Type = Rec.Type::Resource then
+            if Res.Get(Rec."No.") then begin
+                Rec.Validate("Work Type Code", Res."Work Type Code");
+                Rec.Validate("WO Supervisor", Res.Supervisor);
+                Rec.Validate("Resource Type", Res.Type);
                 TimeKeepingTableRec.SetRange("Document Type", Rec."Document Type");
                 TimeKeepingTableRec.SetRange("Document No.", Rec."Document No.");
                 TimeKeepingTableRec.SetRange("Line No.", Rec."Line No.");
                 if TimeKeepingTableRec.FindFirst() then
                     Error('Time Keeping Record already exists for Work Order %1 with Line No. %2', Rec."Document No.", Rec."Line No.");
-
                 GeneralFunctions.InsertRecordInTimeKeepingTable(Rec);
             end;
     end;
 
+
+
     [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterModifyEvent', '', false, false)]
-    local procedure OnAfterSalesLineModify(var Rec: Record "Sales Line")
+    local procedure OnAfterSalesLineModify(var Rec: Record "Sales Line"; var xRec: Record "Sales Line")
     var
         GeneralFunctions: Codeunit "H2O General Functions";
+        POWOValidation: Codeunit "H2O PO WO Validation";
     begin
         if SalesPostBoolean_Grec then
             exit;
+        if (Rec."Purchase Order No." <> xRec."Purchase Order No.") or (Rec."H2O Purchase Line No." <> xRec."H2O Purchase Line No.")
+        then
+            POWOValidation.ValidatePOWorkOrderLink(Rec);
+
         GeneralFunctions.ModifyRecordInTimeKeepingTable(Rec);
     end;
+
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnBeforeDeleteEvent', '', false, false)]
     local procedure OnBeforeDeleteSalesLine(var Rec: Record "Sales Line")
@@ -70,10 +83,30 @@ codeunit 52100 "H2O Event Subscribers"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", OnBeforePostSalesDoc, '', false, false)]
-    local procedure OnBeforePostSalesDoc()
+    local procedure OnBeforePostSalesDoc(var SalesHeader: Record "Sales Header"; CommitIsSuppressed: Boolean; PreviewMode: Boolean; var HideProgressWindow: Boolean; var IsHandled: Boolean; CalledBy: Integer)
+    var
+        SalesLine: Record "Sales Line";
+        POWOValidation: Codeunit "H2O PO WO Validation";
     begin
+        if SalesHeader."Document Type" <> SalesHeader."Document Type"::Order then
+            exit;
+        if SalesHeader."H2O Purchase Order No." <> '' then
+            // POWOValidation.ValidatePOFullyPaid(SalesHeader."H2O Purchase Order No.");
+            POWOValidation.ValidatePOCustomerPayment(SalesHeader."H2O Purchase Order No.");
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        if SalesLine.FindSet() then
+            repeat
+                POWOValidation.ValidatePOWorkOrderLink(SalesLine);
+            until SalesLine.Next() = 0;
+
         SalesPostBoolean_Grec := true;
     end;
+
+    //begin
+    //SalesPostBoolean_Grec := true;
+
+    //end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", OnAfterPostSalesDoc, '', false, false)]
     local procedure OnAfterPostSalesDoc()
@@ -88,6 +121,7 @@ codeunit 52100 "H2O Event Subscribers"
     begin
         if GenJournalLine."Document Type" = GenJournalLine."Document Type"::Invoice then begin
             if SalesInvoiceHeader.Get(GenJournalLine."Document No.") then
+                //CustLedgerEntry."fO Purchase Order No." := SalesInvoiceHeader."H2O Purchase Order No.";
                 CustLedgerEntry."H2O Purchase Order No." := SalesInvoiceHeader."H2O Purchase Order No.";
         end;
     end;
@@ -120,6 +154,22 @@ codeunit 52100 "H2O Event Subscribers"
     begin
         if PurchaseLine.Type = PurchaseLine.Type::Item then
             PurchaseLine.Validate("Direct Unit Cost", 0);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterValidateEvent', 'Purchase Order No.', false, false)]
+    local procedure SalesLine_OnAfterValidatePurchaseOrderNo(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; CurrFieldNo: Integer)
+    var
+        POWOValidation: Codeunit "H2O PO WO Validation";
+    begin
+        POWOValidation.ValidatePOWorkOrderLink(Rec);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterValidateEvent', 'H2O Purchase Line No.', false, false)]
+    local procedure SalesLine_OnAfterValidatePurchaseLineNo(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; CurrFieldNo: Integer)
+    var
+        POWOValidation: Codeunit "H2O PO WO Validation";
+    begin
+        POWOValidation.ValidatePOWorkOrderLink(Rec);
     end;
 
     var

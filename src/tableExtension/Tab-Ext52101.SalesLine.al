@@ -67,6 +67,12 @@ tableextension 52101 "H2O Sales Line" extends "Sales line"
         {
             DataClassification = CustomerContent;
             Caption = 'Purchase Line No.';
+            trigger OnValidate()
+            var
+                POWOValidation: Codeunit "H2O PO WO Validation";
+            begin
+                POWOValidation.ValidatePOWorkOrderLink(Rec);
+            end;
         }
     }
 
